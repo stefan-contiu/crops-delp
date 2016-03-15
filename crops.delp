@@ -1,0 +1,88 @@
+%	
+%	DeLP generated for instance #32 of crops dataset.
+%	Input Values:
+% 		g = 2.02, m = 1.85, ndvi = -1.16, plant = May 10, harvest = Oct 15, harvest dry.
+%
+%	This instance is debatable because DT predicts cotton, while NN and SVM predict soybean.
+%
+
+% Rules extracted from decision tree classifier
+cotton -< dt(g,m,ndvi).
+~corn -< dt(g,m,ndvi).
+~soybean -< dt(g,m,ndvi).
+~rice -< dt(g,m,ndvi).
+
+% Rules extracted from the Neural Network and SVM classifiers
+soybean -< nn(g,m,ndvi).
+~corn -< nn(g,m,ndvi).
+~rice -< nn(g,m,ndvi).
+~cotton -< nn(g,m,ndvi).
+soybean -< svm(g,m,ndvi).
+~corn -< svm(g,m,ndvi).
+~rice -< svm(g,m,ndvi).
+~cotton -< svm(g,m,ndvi).
+
+% Expert rules derived from phenological plant and harvest dates.
+corn -< expert_corn(plant), expert_corn(harvest).
+~corn -< ~expert_corn(plant).
+~corn -< ~expert_corn(harvest).
+rice -< expert_rice(plant), expert_rice(harvest).
+~rice -< ~expert_rice(plant).
+~rice -< ~expert_rice(harvest).
+cotton -< expert_cotton(plant), expert_cotton(harvest).
+~cotton -< ~expert_cotton(plant).
+~cotton -< ~expert_cotton(harvest).
+soybean -< expert_soybean(plant), expert_soybean(harvest).
+~soybean -< ~expert_soybean(plant).
+~soybean -< ~expert_soybean(harvest).
+
+% Expert rules derived from expert defined g, m, ndvi margins.
+corn -< expert_corn(g), expert_corn(m), expert_corn(ndvi).
+~corn -< ~expert_corn(g).
+~corn -< ~expert_corn(m).
+~corn -< ~expert_corn(ndvi).
+rice -< expert_rice(g), expert_rice(m), expert_rice(ndvi).
+~rice -< ~expert_rice(g).
+~rice -< ~expert_rice(m).
+~rice -< ~expert_rice(ndvi).
+cotton -< expert_cotton(g), expert_cotton(m), expert_cotton(ndvi).
+~cotton -< ~expert_cotton(g).
+~cotton -< ~expert_cotton(m).
+~cotton -< ~expert_cotton(ndvi).
+soybean -< expert_soybean(g), expert_soybean(m), expert_soybean(ndvi).
+~soybean -< ~expert_soybean(g).
+~soybean -< ~expert_soybean(m).
+~soybean -< ~expert_soybean(ndvi).
+
+% Expert rules derived from the fact the crop is harvested dry.
+corn -< harvested_dry.
+~rice <- harvested_dry.
+cotton -< harvested_dry.
+soybean -< harvested_dry.
+
+% Rules that contain mathematical formulas are pre-evaluated.
+% Expert rules are stronger than classifiers thus using facts.
+dt(g,m,ndvi) -< true. 		% m > -0.01, ndvi in ]-1.31, 0.07]
+nn(g,m,ndvi) -< true.		% 0.21*m - 1.44*ndvi > 1.83
+svm(g,m,ndvi) -< true. 		% g > 0.001, ndvi <= -1.1
+expert_corn(plant) <- true. 		% plant in [Apr-20 .. May-25]
+expert_corn(harvest) <- true. 		% harvest in [Sep-20 .. Oct 30]
+expert_rice(plant) <- true. 		% plant in [May-1 .. May-25]
+expert_rice(harvest) <- true. 		% harvest in [Sep-25 to Oct-25]
+expert_cotton(plant) <- true. 		% plant in [May-5 .. May-20]
+expert_cotton(harvest) <- true. 	% harvest in [Oct-5 .. Oct-30]
+~expert_soybean(plant) <- true. 	% plant in [May-15 .. Jul-1]
+expert_soybean(harvest) <- true. 	% harvest in [Oct-10 .. Oct-30]
+~expert_corn(g) <- true. 		% g in [-1.13, 0.05]
+~expert_corn(m) <- true. 		% m in [-0.94, 0.07]
+~expert_corn(ndvi) <- true. 	% ndvi in [-0.59, 1.07]
+~expert_rice(g) <- true. 		% g in [-0.69, -0.5]
+~expert_rice(m) <- true.		% m in [-1.33, -0.51]
+expert_rice(ndvi) <- true. 		% ndvi in [-1.37, 0.18]
+expert_cotton(g) <- true.		% g in [-0.03, 2.48]
+expert_cotton(m) <- true.		% m in [0.18, 2.08]
+expert_cotton(ndvi) <- true. 	% ndvi in [-1.56, 0.06]
+expert_soybean(g) <- true.		% g in [0.21, 3.15]
+expert_soybean(m) <- true.		% m in [0.36, 2.31]
+expert_soybean(ndvi) <- true.	% ndvi in [-2.22, -0.28]
+harvested_dry <- true.
